@@ -14,7 +14,7 @@ from dash import Dash, html, dcc, Input, Output
 import plotly.express as px
 import plotly.io as pio
 
-pio.renderers.default='notebook'
+#pio.renderers.default='notebook'
 
 from flask import (Flask, redirect, render_template, request,
                    send_from_directory, url_for)
