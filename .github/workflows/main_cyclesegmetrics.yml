@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'CycleSegMetrics'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4D18B5B92E6948589C83A6D6E3021310 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BDE238D22DC043ECA44A83DA82282DC5 }}
