@@ -24,7 +24,7 @@ from flask import (Flask, redirect, render_template, request,
 
 
 app = Dash(__name__)
-baseURL="https://www.aims.structint.com/aimspreprodapi/"
+baseURL="https://planttrack.structint.com/aimspreprodapi/"
 
 subDomain="ngbu"
 
