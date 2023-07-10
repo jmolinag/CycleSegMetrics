@@ -1,3 +1,4 @@
+from dash import Dash, dcc, html, Input, Output, callback
 import os
 import logging
 import json
@@ -10,21 +11,16 @@ import flask
 import waitress
 import code, copy, datetime as dt
 from datetime import datetime
-from dash import Dash, html, dcc, Input, Output
 import plotly.express as px
 import plotly.io as pio
-
-#pio.renderers.default='notebook'
 
 from flask import (Flask, redirect, render_template, request,
                    send_from_directory, url_for)
 
-
-
-
-
 app = Dash(__name__)
-baseURL="https://planttrack.structint.com/aimspreprodapi/"
+server = app.server
+
+baseURL="https://www.aims.structint.com/aimspreprodapi/"
 
 subDomain="ngbu"
 
@@ -60,7 +56,7 @@ payload = {
 { "EntityCategoryName":"Asset", "EntityTypeName":"Pipeline", "Fields":[ "Name"]
 },
 { "EntityCategoryName":"Asset", "EntityTypeName":"Cycle Segment", "Fields":[ "Name", "State","Area Type", "Segment Length", "Outside Diameter",
-        "Wall Thickness", "Grade", "MAOP", "Test Pressure", "BinLife"]
+        "Wall Thickness", "Grade", "MAOP", "Test Pressure", "BinLife", "BinSSI13ksi"]
 }
 
 
@@ -88,12 +84,15 @@ df["Cycle Segment.Has_MAOP"] = np.where(pd.isna(df["Cycle Segment.MAOP"]), 0, 1)
 df["Cycle Segment.Has_Test Pressure"] = np.where(pd.isna(df["Cycle Segment.Test Pressure"]), 0, 1)
 df["Length_miles"] =round(df['Cycle Segment.Segment Length'].apply(lambda x: float(x))/5280,1)
 
+
+
 app.layout = html.Div([
-    html.H4('Analysis of Data'),
+    html.H1("Analytics Dashboard of Dataset", style={"textAlign":"center"}),
+    html.Hr(),
     dcc.Graph(id="graph"),
     html.P("Names:"),
     dcc.Dropdown(id='names',
-    options=['Cycle Segment.BinLife', 'Cycle Segment.Has_Outside Diameter', 'Cycle Segment.Has_Wall Thickness', 
+    options=['Cycle Segment.BinLife','Cycle Segment.BinSSI13ksi', 'Cycle Segment.Has_Outside Diameter', 'Cycle Segment.Has_Wall Thickness', 
     'Cycle Segment.Has_Grade', 'Cycle Segment.Has_MAOP', 'Cycle Segment.Has_Test Pressure', 'Pipeline.Name'],
     value='Cycle Segment.BinLife', clearable=False
     ),
@@ -118,16 +117,12 @@ app.layout = html.Div([
 ])
 
 
-
-
-
 @app.callback(
     Output("graph", "figure"), 
     Input("names", "value"), 
     Input("pipeline_dropdown", "value"),
     Input("state_dropdown", "value"),
     Input("area_dropdown", "value"))
-
 def generate_chart(names, pipeline_dropdown, state_dropdown, area_dropdown):
     dff = df.copy()
     if pipeline_dropdown:
@@ -142,13 +137,5 @@ def generate_chart(names, pipeline_dropdown, state_dropdown, area_dropdown):
     fig = px.pie(dff, values=dff['Length_miles'], names=names, hole=.3)
     return fig
 
-
 if __name__ == '__main__':
-    from waitress import serve
-    #serve(app, host="0.0.0.0", port=8080)
-    app.run_server(debug=True, use_reloader=False)
-    
-
-
-
-
+    app.run_server(debug=True)
